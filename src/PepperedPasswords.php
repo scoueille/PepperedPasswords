@@ -64,7 +64,7 @@ final class PepperedPasswords
 	 */
 	public function verify(string $password, string $passwordHash) : bool
 	{
-		return password_verify($this->_hmac($password), $passwordHash);
+		return password_verify($this->_hmac($password), $passwordHash) || password_verify($this->_oldHmac($password), $passwordHash);
 	}
 	
 	/**
@@ -73,6 +73,17 @@ final class PepperedPasswords
 	 * @return string the HMac for the supplied password
 	 */
 	private function _hmac(string $password)
+	{
+		return hash_hmac(self::HMAC_ALGORITHM, $password, $this->_pepper);
+	}
+        
+        
+	/**
+	 * Compute the HMac for the password
+	 *
+	 * @return string the HMac for the supplied password
+	 */
+	private function _oldHmac(string $password)
 	{
 		return hash_hmac(self::HMAC_ALGORITHM, $password, $this->_pepper, true);
 	}
